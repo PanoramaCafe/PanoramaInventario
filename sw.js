@@ -1,4 +1,4 @@
-const CACHE_NAME = 'panorama-cafe-inventario-v19-conteo';
+const CACHE_NAME = 'panorama-cafe-inventario-v20-scroll';
 
 const APP_SHELL = [
   './',
