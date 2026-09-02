@@ -11,7 +11,31 @@
    ===================================================================== */
 
 /* ---------------- Eventos ---------------- */
-function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function esc(s){ return String(s??'').replace(/[&<>\"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c])); }
+
+// Re-render de la pantalla de conteo sin perder la posición del usuario.
+// En algunos navegadores Android, reemplazar app.innerHTML mientras un
+// control tiene el foco provoca que el scroll vuelva al inicio de la página.
+function renderConteoPreservePosition(activeSelector){
+  const x = window.scrollX || 0;
+  const y = window.scrollY || 0;
+  render();
+
+  if(activeSelector){
+    const again = document.querySelector(activeSelector);
+    if(again){
+      try{ again.focus({preventScroll:true}); }
+      catch(_){ again.focus(); }
+    }
+  }
+
+  // Dos frames ayudan especialmente en Chrome/Samsung cuando el teclado
+  // virtual reajusta el viewport después de reconstruir el DOM.
+  requestAnimationFrame(()=>{
+    window.scrollTo(x,y);
+    requestAnimationFrame(()=>window.scrollTo(x,y));
+  });
+}
 
 function attachGlobalEvents(){
   document.querySelectorAll('nav.tabs button').forEach(b=>{
@@ -84,7 +108,7 @@ function attachGlobalEvents(){
       saveState(); render();
     };
     if(inUse>0){
-      openConfirmModal(`${inUse} producto(s) usan este proveedor y quedarán como "Sin proveedor". ¿Continuar?`, doDelete, 'Sí, eliminar');
+      openConfirmModal(`${inUse} producto(s) usan esta categoría y quedarán como "Sin proveedor". ¿Continuar?`, doDelete, 'Sí, eliminar');
     } else {
       doDelete();
     }
@@ -94,20 +118,49 @@ function attachGlobalEvents(){
   const cntFilterCat = document.getElementById('cnt-filter-cat');
   if(cntFilterCat) cntFilterCat.onchange = (e)=>{ ui.countFilterCat = e.target.value; render(); };
 
+  // En Android/Samsung no reconstruimos toda la pantalla en cada tecla.
+  // El valor queda en ui.countDraft mientras se captura y el render se hace
+  // al cambiar de control, conservando la posición y el foco.
   document.querySelectorAll('[data-count-qty]').forEach(e=>{
     e.oninput = ()=>{
       ui.countDraft[e.dataset.countQty] = e.value;
-      render();
+    };
+    e.onchange = ()=>{
+      ui.countDraft[e.dataset.countQty] = e.value;
+      renderConteoPreservePosition(`[data-count-qty="${e.dataset.countQty}"]`);
     };
   });
 
-  document.querySelectorAll('[data-count-warehouse]').forEach(e=>{ e.oninput=()=>{ const id=e.dataset.countWarehouse; const d=ui.countDraft[id]&&typeof ui.countDraft[id]==='object'?ui.countDraft[id]:{}; d.warehouse=e.value; ui.countDraft[id]=d; render(); }; });
-  document.querySelectorAll('[data-count-warehouse-level]').forEach(e=>{ e.onchange=()=>{ const id=e.dataset.countWarehouseLevel; const d=ui.countDraft[id]&&typeof ui.countDraft[id]==='object'?ui.countDraft[id]:{}; d.level=e.value; ui.countDraft[id]=d; render(); }; });
+  document.querySelectorAll('[data-count-warehouse]').forEach(e=>{
+    e.oninput=()=>{
+      const id=e.dataset.countWarehouse;
+      const d=ui.countDraft[id]&&typeof ui.countDraft[id]==='object'?ui.countDraft[id]:{};
+      d.warehouse=e.value;
+      ui.countDraft[id]=d;
+    };
+    e.onchange=()=>{
+      const id=e.dataset.countWarehouse;
+      const d=ui.countDraft[id]&&typeof ui.countDraft[id]==='object'?ui.countDraft[id]:{};
+      d.warehouse=e.value;
+      ui.countDraft[id]=d;
+      renderConteoPreservePosition(`[data-count-warehouse="${id}"]`);
+    };
+  });
+
+  document.querySelectorAll('[data-count-warehouse-level]').forEach(e=>{
+    e.onchange=()=>{
+      const id=e.dataset.countWarehouseLevel;
+      const d=ui.countDraft[id]&&typeof ui.countDraft[id]==='object'?ui.countDraft[id]:{};
+      d.level=e.value;
+      ui.countDraft[id]=d;
+      renderConteoPreservePosition(`[data-count-warehouse-level="${id}"]`);
+    };
+  });
 
   document.querySelectorAll('[data-count-level]').forEach(e=>{
     e.onchange = ()=>{
       ui.countDraft[e.dataset.countLevel] = e.value;
-      render();
+      renderConteoPreservePosition(`[data-count-level="${e.dataset.countLevel}"]`);
     };
   });
 
