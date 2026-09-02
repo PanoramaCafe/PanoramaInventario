@@ -71,9 +71,20 @@ function renderConteo(){
     const p = state.products.find(pp=>pp.id===id);
     if(!p) return;
 
-    const counted = Number(ui.countDraft[id]);
-    if(p.stockMode==='warehouse'){ const d=counted&&typeof ui.countDraft[id]==='object'?ui.countDraft[id]:{}; const bw=Number(d.warehouse); const bl=Number(d.level); if(!Number.isFinite(bw)||!Number.isFinite(bl)) return; const system=physicalStockEquivalent(p); const countedEq=bw+bl/100; const variance=countedEq-system; if(variance!==0){ varianceRows.push({p,variance,countedLabel:`Bodega: ${bw} · En uso: ${bl}%`, warehouse:bw, level:bl}); varianceValue+=variance*stockCostPerPhysicalUnit(p); }
+    if(p.stockMode==='warehouse'){
+      const d=ui.countDraft[id]&&typeof ui.countDraft[id]==='object'?ui.countDraft[id]:{};
+      const bw=Number(d.warehouse);
+      const bl=Number(d.level);
+      if(!Number.isFinite(bw)||!Number.isFinite(bl)) return;
+      const system=physicalStockEquivalent(p);
+      const countedEq=bw+bl/100;
+      const variance=countedEq-system;
+      if(variance!==0){
+        varianceRows.push({p,variance,countedLabel:`Bodega: ${bw} · En uso: ${bl}%`,warehouse:bw,level:bl});
+        varianceValue+=variance*stockCostPerPhysicalUnit(p);
+      }
     } else if(p.stockMode==='level'){
+      const counted = Number(ui.countDraft[id]);
       const system = Number(p.stockLevel)||0;
       const variance = counted - system;
       if(variance!==0){
@@ -81,6 +92,7 @@ function renderConteo(){
         varianceValue += (variance/100) * stockCostPerPhysicalUnit(p);
       }
     }else{
+      const counted = Number(ui.countDraft[id]);
       const system = Number(p.stock)||0;
       const variance = counted - system;
       if(variance!==0){
@@ -188,4 +200,3 @@ function renderConteo(){
     ` : ''}
   `;
 }
-
