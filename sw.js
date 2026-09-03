@@ -1,4 +1,4 @@
-const CACHE_NAME = 'panorama-cafe-inventario-v22-compras-teclado';
+const CACHE_NAME = 'panorama-cafe-inventario-v23-tablet-zoom';
 
 const APP_SHELL = [
   './','./index.html','./manifest.json','./icon-192.png','./icon-512.png','./icon-512-maskable.png',
