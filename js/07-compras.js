@@ -44,16 +44,14 @@ function orderEquivalent(p,qty){
 }
 
 // Ajusta rápidamente la cantidad de compra en pasos de una presentación.
-// Se mantiene el scroll para que sea cómodo en tablet y móvil.
+// El botón no enfoca el campo de cantidad para evitar abrir el teclado en Android.
 function changePurchaseQty(id,delta){
   const current=Number(ui.purchase[id])||0;
   const next=Math.max(0,current+delta);
   ui.purchase[id]=String(next);
-  if(typeof renderConteoPreservePosition==='function'){
-    renderConteoPreservePosition(`[data-purchase-qty="${id}"]`);
-  }else{
-    render();
-  }
+  const y=window.scrollY||0;
+  render();
+  requestAnimationFrame(()=>window.scrollTo(window.scrollX||0,y));
 }
 
 function renderCompra(){
