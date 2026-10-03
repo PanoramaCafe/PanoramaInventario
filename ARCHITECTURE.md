@@ -83,4 +83,4 @@ nuevo dentro de `state.products`.
 - Al subir, se hace `update ... where updated_at = <_lastsync>`. Si otro dispositivo escribió antes, no se actualiza ninguna fila: se descarga la nube, se **fusiona por id** (tres vías contra `_base`: lo que cambió aquí gana aquí, lo que cambió allá se conserva, los historiales se unen) y se reintenta.
 - La nube anterior queda en `localStorage` bajo `..._remote_backup` por si hay que revisar algo.
 - Restaurar un respaldo JSON activa `window.panoramaForceOverwrite` para reemplazar la nube sin fusionar.
-- Seguridad: ver `supabase/cerrar-acceso-anonimo.sql`.
+- Seguridad: ver `cerrar-acceso-anonimo.sql`.
