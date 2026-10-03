@@ -51,7 +51,7 @@ function renderProductos(){
       <table>
         <thead><tr>
           <th>Producto</th><th>Marca</th><th>Categoría</th><th>Proveedor</th>
-          <th class="num">Costo actual</th><th class="num">Stock</th><th>Estado</th><th>Acciones</th>
+          <th class="num">Costo actual</th><th class="num">Precio de compra</th><th class="num">Stock</th><th>Estado</th><th>Acciones</th>
         </tr></thead>
         <tbody>
         ${list.map(p=>{
@@ -63,6 +63,7 @@ function renderProductos(){
             <td>${esc(catName(p.categoryId))}</td>
             <td>${esc(supName(p.supplierId))}</td>
             <td class="num">${unitCostMoney(p.cost)} <span style="color:var(--chalk-faint); font-size:0.75rem;">/${esc(p.unit||'u')}</span></td>
+            <td class="num">${orderUnitCost(p)>0 ? money(orderUnitCost(p)) : '<span style="color:var(--chalk-faint);">—</span>'}${orderUnitCost(p)>0 ? ` <span style="color:var(--chalk-faint); font-size:0.75rem;">/${esc(orderUnit(p))}</span>` : ''}</td>
             <td class="num">${stockControlLabel(p)}${hasPU && p.stockMode==='exact'? `<div style="font-size:0.7rem; color:var(--chalk-faint);">≈ ${(Number(p.stock)/Number(p.purchaseUnitQty)).toFixed(1)} ${esc(p.purchaseUnit)}</div>` : ''}</td>
             <td>${low? '<span class="badge low">bajo</span>' : '<span class="badge ok">ok</span>'}</td>
             <td class="row-actions">
@@ -73,7 +74,7 @@ function renderProductos(){
               <button class="icon-btn danger" data-action="delete-product" data-id="${p.id}">✕ Eliminar</button>
             </td>
           </tr>
-          ${ui.expandedHistory===p.id ? `<tr><td colspan="8">${renderHistoryPanel(p)}</td></tr>` : ''}
+          ${ui.expandedHistory===p.id ? `<tr><td colspan="9">${renderHistoryPanel(p)}</td></tr>` : ''}
           `;
         }).join('')}
         </tbody>

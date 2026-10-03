@@ -1,4 +1,4 @@
-const CACHE_NAME = 'panorama-cafe-inventario-v24-sync-seguro';
+const CACHE_NAME = 'panorama-cafe-inventario-v25-precio-compra';
 
 const APP_SHELL = [
   './','./index.html','./manifest.json','./icon-192.png','./icon-512.png','./icon-512-maskable.png',
